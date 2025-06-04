@@ -1,0 +1,35 @@
+InsideConnect/
+├── frontend/                  # Next.js (React) Web Application
+│   ├── components/            # Reusable React components
+│   │   └── ui/                # NextUI specific components or styled components
+│   ├── pages/                 # Next.js pages (routes)
+│   ├── public/                # Static assets (images, fonts, etc.)
+│   ├── styles/                # Global styles, Tailwind CSS config (if used)
+│   ├── utils/                 # Utility functions for the frontend
+│   ├── .env.local             # Environment variables for frontend (Next.js specific)
+│   ├── next.config.js         # Next.js configuration
+│   └── package.json           # Frontend dependencies and scripts
+│
+├── mobile/                    # React Native Mobile Application (We'll set this up later)
+│   └── # (Structure for React Native project will be defined when we initiate it)
+│
+├── backend/                   # Express.js API Server
+│   ├── config/                # Configuration files (db, environment)
+│   ├── controllers/           # Route handlers, business logic
+│   ├── database/              # Knex.js migrations and seeds will go here
+│   │   ├── migrations/
+│   │   └── seeds/
+│   ├── middleware/            # Custom Express middleware
+│   ├── models/                # Database models/abstractions (if we decide to use them with Knex)
+│   ├── routes/                # API route definitions
+│   ├── .env                   # Environment variables for backend
+│   ├── knexfile.js            # Knex.js configuration
+│   ├── server.js              # Main server entry point (or app.js)
+│   └── package.json           # Backend dependencies and scripts
+│
+├── docs/                      # Technical specifications, planning documents, prompts
+│
+├── scripts/                   # Utility scripts (e.g., deployment, data migration)
+│
+├── .gitignore                 # Specifies intentionally untracked files that Git should ignore
+└── README.md                  # Project overview, setup instructions, etc.
