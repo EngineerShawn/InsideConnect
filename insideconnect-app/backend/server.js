@@ -3,11 +3,13 @@ const path = require('path');
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // --- Add this line to handle JSON request bodies ---
 app.use(express.json());
+app.use(cors()); // Use cors middleware
 
 // --- Add these two lines to import and use the auth routes ---
 const authRoutes = require('./routes/auth');
