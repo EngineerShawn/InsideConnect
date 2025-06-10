@@ -1,5 +1,12 @@
 // backend/knexfile.js
-require('dotenv').config({ path: './.env' });
+
+// Link dotenv
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
+
+
+
 
 /**
  * @type { Object.<string, import("knex").Knex.Config> }

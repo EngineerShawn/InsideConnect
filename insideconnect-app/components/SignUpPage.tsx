@@ -1,102 +1,210 @@
 /* eslint-disable prettier/prettier */
+// insideconnect-app/components/SignUpPage.tsx
 "use client";
-// ./app/components/SignUpPage.tsx
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
+
+import { states } from "../app/lib/mockData";
+
+import { EyeFilledIcon, EyeSlashFilledIcon, ChevronDownIcon } from "@/components/icons";
+import { Selection } from "@react-types/shared";
 
 const SignUpPage = () => {
     const router = useRouter();
 
-    const handleSignUp = (e: React.FormEvent) => {
-        e.preventDefault();
-        localStorage.setItem("isLoggedIn", "true");
-        router.push("/dashboard");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [streetAddress, setStreetAddress] = useState("");
+    const [city, setCity] = useState("");
+    const [selectedState, setSelectedState] = useState(new Set<string>());
+    const [zipCode, setZipCode] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+
+    // State for password visibility
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+
+    // State for validation errors
+    const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+    const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
+
+    // Memoized value for the dropdown trigger display
+    const selectedStateValue = useMemo(
+        () => Array.from(selectedState).join(", ").replaceAll("_", " "),
+        [selectedState]
+    );
+
+    const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+    const toggleConfirmPasswordVisibility = () => setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
+
+    // --- REAL-TIME PASSWORD VALIDATION ---
+    const validatePassword = (value: string) => {
+        const errors: string[] = [];
+
+        if (value.length < 8) {
+            errors.push("Be at least 8 characters long.");
+        }
+        if (!/[A-Z]/.test(value)) {
+            errors.push("Contain at least one uppercase letter.");
+        }
+        if (!/[a-z]/.test(value)) {
+            errors.push("Contain at least one lowercase letter.");
+        }
+        if (!/\d/.test(value)) {
+            errors.push("Contain at least one number.");
+        }
+        if (!/[@$!%*?&]/.test(value)) {
+            errors.push("Contain at least one special character (@$!%*?&).");
+        }
+        setPasswordErrors(errors);
     };
 
+    const handlePasswordChange = (value: string) => {
+        setPassword(value);
+        validatePassword(value);
+    };
+
+const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Run validation checks as before
+    validatePassword(password);
+    if (password !== confirmPassword) {
+        setConfirmPasswordError("Passwords do not match.");
+        return;
+    } else {
+        setConfirmPasswordError("");
+    }
+
+    if (passwordErrors.length > 0) {
+        console.log("Validation failed. Please correct the errors.");
+        return;
+    }
+
+    // --- API Call ---
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                firstName, lastName, email, password, streetAddress, city,
+                state: selectedStateValue,
+                zipCode, phoneNumber,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // If the server returns an error, display it
+            alert(`Error: ${data.message}`);
+        } else {
+            // On success, show the verification message and redirect
+            alert(data.message);
+            router.push('/login'); // Redirect to login page to await verification
+        }
+
+    } catch (error) {
+        console.error("Failed to submit form:", error);
+        alert("An unexpected error occurred. Please try again.");
+    }
+};
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Create a new account
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div className="sm:mx-auto sm:w-full sm:max-w-2xl">
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+                    Create Your InsideConnect Account
                 </h2>
-                <p className="mt-2 text-center text-sm text-gray-600">
+                <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
                     Already have an account?{" "}
-                    <Link
-                        href="/login"
-                        className="font-medium text-blue-600 hover:text-blue-500"
-                    >
-                        Sign in
+                    <Link className="font-medium text-blue-600 hover:text-blue-500" href="/login">
+                        Sign In
                     </Link>
                 </p>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-4 shadow-lg sm:rounded-2xl sm:px-10">
+            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-2xl">
+                <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow-lg sm:rounded-2xl sm:px-10">
                     <form className="space-y-6" onSubmit={handleSignUp}>
-                        <div>
-                            <label
-                                htmlFor="name"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Full name
-                            </label>
-                            <div className="mt-1">
-                                <input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    required
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Input isRequired label="First Name" placeholder="Enter your first name" type="text" value={firstName} variant="bordered" onValueChange={setFirstName} />
+                            <Input isRequired label="Last Name" placeholder="Enter your last name" type="text" value={lastName} variant="bordered" onValueChange={setLastName} />
+                        </div>
+                        <Input isRequired label="Email" placeholder="Enter your email" type="email" value={email} variant="bordered" onValueChange={setEmail} />
+
+                        <Input
+                            isRequired
+                            endContent={
+                                <button className="focus:outline-none" type="button" onClick={togglePasswordVisibility}>
+                                    {isPasswordVisible ? <EyeSlashFilledIcon className="text-2xl text-default-400" /> : <EyeFilledIcon className="text-2xl text-default-400" />}
+                                </button>
+                            }
+                            errorMessage={
+                                password.length > 0 && passwordErrors.length > 0 && (
+                                    <ul className="list-disc pl-5">
+                                        {passwordErrors.map((error, i) => <li key={i}>{error}</li>)}
+                                    </ul>
+                                )
+                            }
+                            isInvalid={password.length > 0 && passwordErrors.length > 0}
+                            label="Password"
+                            placeholder="Create a password"
+                            type={isPasswordVisible ? "text" : "password"}
+                            value={password}
+                            variant="bordered"
+                            onValueChange={handlePasswordChange}
+                        />
+                        <Input
+                            isRequired
+                            endContent={
+                                <button className="focus:outline-none" type="button" onClick={toggleConfirmPasswordVisibility}>
+                                    {isConfirmPasswordVisible ? <EyeSlashFilledIcon className="text-2xl text-default-400" /> : <EyeFilledIcon className="text-2xl text-default-400" />}
+                                </button>
+                            }
+                            errorMessage={confirmPasswordError}
+                            isInvalid={!!confirmPasswordError}
+                            label="Confirm Password"
+                            placeholder="Confirm your password"
+                            type={isConfirmPasswordVisible ? "text" : "password"}
+                            value={confirmPassword}
+                            variant="bordered"
+                            onValueChange={setConfirmPassword}
+                        />
+
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-6 space-y-6">
+                            <Input isRequired label="Street Address" placeholder="123 Main St" type="text" value={streetAddress} variant="bordered" onValueChange={setStreetAddress} />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <Input isRequired label="City" placeholder="Anytown" type="text" value={city} variant="bordered" onValueChange={setCity} />
+                                <Dropdown>
+                                    <DropdownTrigger>
+                                        <Button className="w-full justify-between capitalize h-14" endContent={<ChevronDownIcon className="text-default-500" />} variant="bordered">
+                                            {selectedStateValue || "Select State"}
+                                        </Button>
+                                    </DropdownTrigger>
+                                    <DropdownMenu disallowEmptySelection aria-label="State selection" className="max-h-60 overflow-y-auto" selectedKeys={selectedState} selectionMode="single" variant="flat" onSelectionChange={(keys: Selection) => setSelectedState(keys as Set<string>)}>
+                                        {states.map((s) => <DropdownItem key={s}>{s}</DropdownItem>)}
+                                    </DropdownMenu>
+                                </Dropdown>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <Input isRequired label="Zip Code" placeholder="12345" type="text" value={zipCode} variant="bordered" onValueChange={setZipCode} />
+                                <Input isRequired label="Phone Number" placeholder="(555) 555-5555" type="tel" value={phoneNumber} variant="bordered" onValueChange={setPhoneNumber} />
                             </div>
                         </div>
 
                         <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Email address
-                            </label>
-                            <div className="mt-1">
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    required
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label
-                                htmlFor="password"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Password
-                            </label>
-                            <div className="mt-1">
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <button
-                                type="submit"
-                                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
+                            <Button className="w-full" color="primary" type="submit">
                                 Create Account
-                            </button>
+                            </Button>
                         </div>
                     </form>
                 </div>
