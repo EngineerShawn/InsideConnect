@@ -75,7 +75,7 @@ const SignUpPage = () => {
 const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Run validation checks as before
+    // ... (validation logic remains the same)
     validatePassword(password);
     if (password !== confirmPassword) {
         setConfirmPasswordError("Passwords do not match.");
@@ -83,15 +83,15 @@ const handleSignUp = async (e: React.FormEvent) => {
     } else {
         setConfirmPasswordError("");
     }
-
     if (passwordErrors.length > 0) {
         console.log("Validation failed. Please correct the errors.");
         return;
     }
 
-    // --- API Call ---
+    // --- API Call to Express Backend ---
     try {
-        const response = await fetch('/api/auth/register', {
+        // We now call the full URL of our backend server
+        const response = await fetch('http://localhost:3001/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -104,17 +104,15 @@ const handleSignUp = async (e: React.FormEvent) => {
         const data = await response.json();
 
         if (!response.ok) {
-            // If the server returns an error, display it
             alert(`Error: ${data.message}`);
         } else {
-            // On success, show the verification message and redirect
             alert(data.message);
-            router.push('/login'); // Redirect to login page to await verification
+            router.push('/login');
         }
 
     } catch (error) {
         console.error("Failed to submit form:", error);
-        alert("An unexpected error occurred. Please try again.");
+        alert("An unexpected error occurred. Could not connect to the backend server.");
     }
 };
 
