@@ -5,29 +5,50 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { User, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from "@heroui/react";
 
-import { MenuIcon, XIcon } from "./icons"; // Import icons
+import { useAuth } from "../app/context/AuthContext"; // Import our custom hook
+
+import { MenuIcon, XIcon, SearchIcon, BuildingIcon } from "./icons"; // Import icons
 import { ThemeSwitch } from "./theme-switch"; // Import ThemeSwitch
 
 
-
-interface HeaderProps {
-    loggedIn: boolean;
-    onLogout: () => void;
-}
-
 // Header Component
-export const Header = ({ loggedIn, onLogout }: HeaderProps) => {
+export const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const { user, logout, isLoading } = useAuth(); // Use the context
     const router = useRouter();
 
     const handleLogoutClick = () => {
         // onLogout will update the state in RootLayout and clear localStorage
-        onLogout();
-        // Navigate to home page
-        router.push("/");
-        // Ensure the mobile menu is closed if it was open
+        logout();
+        router.push('/login');
         setIsMenuOpen(false);
+    };
+
+    const handleMenuAction = (key: React.Key) => {
+        switch (key) {
+            case "dashboard":
+                router.push('/dashboard');
+                break;
+            case "settings":
+                router.push('/dashboard/settings'); // Assuming you have a /settings page
+                break;
+            case "inmate_search":
+                router.push('/inmate-search');
+                break;
+            case "facility_directory":
+                router.push('/facility-directory');
+                break;
+            case "help_and_feedback":
+                router.push('/help-and-feedback');
+                break;
+            case "logout":
+                handleLogoutClick();
+                break;
+            default:
+                break;
+        }
     };
 
     const navLinks = [
@@ -35,6 +56,10 @@ export const Header = ({ loggedIn, onLogout }: HeaderProps) => {
         { name: "Inmate Search", href: "/inmate-search" },
         { name: "Facility Directory", href: "/facility-directory" },
     ];
+
+    if (isLoading) {
+        return <header className="h-16" />// Render a placeholder during auth check
+    }
 
     return (
         <>
@@ -63,21 +88,36 @@ export const Header = ({ loggedIn, onLogout }: HeaderProps) => {
                         <div className="flex items-center">
                             {/* Desktop Auth Buttons */}
                             <div className="hidden lg:flex items-center space-x-3"> {/* Increased space-x for ThemeSwitch */}
-                                {loggedIn ? (
-                                    <>
-                                        <Link
-                                            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                            href="/dashboard"
-                                        >
-                                            Dashboard
-                                        </Link>
-                                        <button
-                                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 whitespace-nowrap"
-                                            onClick={handleLogoutClick}
-                                        >
-                                            Log Out
-                                        </button>
-                                    </>
+                                {user ? (
+                                    // --- NEW: USER AVATAR DROPDOWN ---
+                                    <Dropdown placement="bottom-end" showArrow radius="sm" classNames={{ base: "before:bg-default-200", content: "p-0 border-small border-divider bg-background" }}>
+                                        <DropdownTrigger>
+                                            <User
+                                                as="button"
+                                                avatarProps={{ src: "https://i.pravatar.cc/150?u=a04258114e29026702d" }}
+                                                className="transition-transform"
+                                                description={user.email}
+                                                name={`${user.firstName} ${user.lastName}`}
+                                            />
+                                        </DropdownTrigger>
+                                        <DropdownMenu aria-label="User Actions" variant="flat" onAction={handleMenuAction}>
+                                            <DropdownSection showDivider aria-label="Profile & Actions">
+                                                <DropdownItem key="dashboard">Dashboard</DropdownItem>
+                                                <DropdownItem key="settings">Settings</DropdownItem>
+                                            </DropdownSection>
+                                            <DropdownSection showDivider aria-label="App Navigation">
+                                                <DropdownItem key="inmate_search" startContent={<SearchIcon className="text-default-500" />}>Inmate Search</DropdownItem>
+                                                <DropdownItem key="facility_directory" startContent={<BuildingIcon className="text-default-500" />}>Facility Directory</DropdownItem>
+                                            </DropdownSection>
+                                            <DropdownSection aria-label="Preferences & Help">
+                                                <DropdownItem key="theme" isReadOnly className="cursor-default" endContent={<ThemeSwitch />}>
+                                                    Theme
+                                                </DropdownItem>
+                                                <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+                                                <DropdownItem key="logout" color="danger">Log Out</DropdownItem>
+                                            </DropdownSection>
+                                        </DropdownMenu>
+                                    </Dropdown>
                                 ) : (
                                     <>
                                         <Link
@@ -94,11 +134,10 @@ export const Header = ({ loggedIn, onLogout }: HeaderProps) => {
                                         </Link>
                                     </>
                                 )}
-                                <ThemeSwitch /> {/* Desktop Theme Switch is here */}
                             </div>
                             {/* Mobile Controls: Always show hamburger. Show Login button if not logged in. */}
                             <div className="lg:hidden flex items-center ml-2"> {/* ml-2 for a bit of space */}
-                                {!loggedIn && (
+                                {!user && (
                                     <Link
                                         className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-transparent rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 mr-1"
                                         href="/login"
@@ -137,7 +176,7 @@ export const Header = ({ loggedIn, onLogout }: HeaderProps) => {
                         ))}
                         <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-2 flex flex-col space-y-2">
 
-                            {loggedIn ? (
+                            {user ? (
                                 <>
                                     <Link
                                         className="w-full text-left px-3 py-2 text-base font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700"

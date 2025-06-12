@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable prettier/prettier */
 // Filename: ./app/dashboard/page.tsx OR ./app/dashboard/[tab]/page.tsx
 "use client";
@@ -5,6 +6,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { AuthProvider } from "@/app/context/AuthContext";
 
 // example data (replace with your real imports)
 const mockInmates = [
@@ -36,9 +38,9 @@ const DashboardPage = () => {
                             >
                                 <div className="flex items-center">
                                     <img
-                                        src={inmate.photoUrl}
                                         alt={inmate.name}
                                         className="h-12 w-12 rounded-full mr-4"
+                                        src={inmate.photoUrl}
                                     />
                                     <div>
                                         <p className="font-bold text-gray-900">{inmate.name}</p>
@@ -93,11 +95,11 @@ const DashboardPage = () => {
 
     const tabLink = (tab: string, label: string) => (
         <Link
-            href={`/dashboard/${tab}`}
             className={`block px-3 py-2 font-medium text-sm rounded-md ${activeTab === tab
                     ? "bg-blue-100 text-blue-700"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}
+            href={`/dashboard/${tab}`}
         >
             {label}
         </Link>

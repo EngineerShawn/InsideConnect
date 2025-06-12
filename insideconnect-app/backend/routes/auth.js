@@ -6,7 +6,10 @@ const bcrypt = require('bcryptjs');
 const knex = require('knex');
 const { Resend } = require('resend');
 const { VerificationEmail } = require('../emails/VerificationEmail.js');
+const { PasswordResetEmail } = require('../emails/PasswordResetEmail.js');
 const knexConfig = require('../knexfile.js');
+const jwt = require('jsonwebtoken');
+
 
 const db = knex(knexConfig.development);
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -103,6 +106,104 @@ router.post('/verify', async (req, res) => {
     } catch (error) {
         console.error("Verification Error:", error);
         res.status(500).json({ message: "An internal server error occurred." });
+    }
+});
+
+// --- POST /api/auth/login ---
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required." });
+        }
+
+        // 1. Find the user by email
+        const user = await db('users').where({ email }).first();
+        if (!user) {
+            return res.status(401).json({ message: "Email and password combination do not match our records." }); // Use a generic message
+        }
+
+        // 2. Check if the user's account has been verified
+        if (!user.is_verified) {
+            return res.status(403).json({ message: "Please verify your email before logging in." });
+        }
+
+        // 3. Compare the provided password with the stored hash
+        const isPasswordCorrect = await bcrypt.compare(password, user.password_hash);
+        if (!isPasswordCorrect) {
+            return res.status(401).json({ message: "Invalid credentials." });
+        }
+
+        // 4. Generate a JWT if credentials are correct
+        const payload = {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            firstName: user.first_name,
+            lastName: user.last_name,
+        };
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET || 'your_default_secret_key', {
+            expiresIn: '1d', // Token expires in 1 day
+        });
+
+        // 5. Send the token and user info back to the client
+        res.status(200).json({
+            message: "Logged in successfully.",
+            token: token,
+            user: {
+                id: user.id,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email,
+            }
+        });
+
+    } catch (error) {
+        console.error("Login Error:", error);
+        res.status(500).json({ message: "An internal server error occurred." });
+    }
+});
+
+// --- POST /api/auth/request-password-reset ---
+router.post('/request-password-reset', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await db('users').where({ email }).first();
+
+        // SECURITY NOTE: We send a success response even if the user is not found.
+        // This prevents attackers from using this form to discover which emails are registered.
+        if (user) {
+            // 1. Generate a secure, single-use token
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+            const tokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 min expiry
+
+            // 2. Store the hashed token and expiry in the database
+            await db('users').where({ id: user.id }).update({
+                verification_token: hashedToken,
+                token_expires_at: tokenExpiresAt,
+            });
+
+            // 3. Create the password reset link for the email
+            const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+
+            // 4. Send the email with the reset link
+            await resend.emails.send({
+                from: 'noreply@insideconnect.dev', // Use a no-reply address
+                to: user.email,
+                subject: 'Your InsideConnect Password Reset Link',
+                react: PasswordResetEmail({ resetLink: resetLink }),
+            });
+        }
+
+        res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
+
+    } catch (error) {
+        console.error("Password Reset Request Error:", error);
+        // Send a generic success message here too for security
+        res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
     }
 });
 

@@ -9,6 +9,7 @@ import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 
 import { Providers } from "./providers";
+import { AuthProvider } from "./context/AuthContext";
 
 import { fontSans } from "@/config/fonts";
 
@@ -54,6 +55,8 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+          {/* AuthProvider wraps everything that needs auth info */}
+          <AuthProvider>
           <div className="relative flex flex-col h-screen">
             <Header loggedIn={loggedIn} onLogout={handleLogout} />
             <main className="container max-w-full flex-grow">
@@ -61,6 +64,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </div>
+          </AuthProvider>
         </Providers>
       </body>
     </html>
