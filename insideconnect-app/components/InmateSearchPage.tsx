@@ -29,6 +29,7 @@ interface Inmate {
     inmateNum: string;
     faclCode: string; // Facility Code for building the link
     faclName: string;
+    faclType: string;
     projRelDate: string;
 }
 
@@ -166,7 +167,7 @@ export const InmateSearchPage = () => {
                             <Card className="p-4 sm:p-6 bg-transparent dark:bg-transparent shadow-none">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <Select defaultSelectedKeys={["BOP"]} label="Type of Number" name="numberType" variant="bordered" onSelectionChange={handleNumberTypeChange}>
-                                        {numberTypes.map((type) => (<SelectItem key={type.key} value={type.key}>{type.label}</SelectItem>))}
+                                        {numberTypes.map((type) => (<SelectItem key={type.key}>{type.label}</SelectItem>))}
                                     </Select>
                                     <Input isRequired label="Number" name="numberValue" value={numberFormData.numberValue} variant="bordered" onChange={handleNumberInputChange} />
                                 </div>
@@ -220,7 +221,7 @@ export const InmateSearchPage = () => {
                                             <div className="space-y-1">
                                                 <h4 className="font-semibold text-gray-800 dark:text-gray-200">Location</h4>
                                                 <Link isExternal color="primary" href={`/facility/${inmate.faclCode}`}>
-                                                    {inmate.faclName}
+                                                    {inmate.faclType} {inmate.faclName}
                                                 </Link>
                                             </div>
                                             {/* Release Details */}
