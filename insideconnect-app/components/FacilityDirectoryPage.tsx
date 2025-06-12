@@ -1,141 +1,124 @@
 /* eslint-disable prettier/prettier */
-// Filename: ./app/FacilityDirectoryPage/page.tsx
+// insideconnect-app/components/FacilityDirectoryPage.tsx
 "use client";
 
-import React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React, { useState, useEffect } from "react";
+import { Input, Card, CardBody, Spinner, Link } from "@heroui/react";
 
-import { mockFacilities, states } from "../app/lib/mockData";
+import { useDebounce } from "../app/hooks/useDebounce";
 
-
-type Facility = {
-    id: string;
-    name: string;
+interface Facility {
+    code: string;
+    nameDisplay: string;
+    address: string;
+    city: string;
     state: string;
-    security: string;
-    type: string;
-    mailRules: string;
-    visitation: string;
-    population: string;
-};
+    zipCode: string;
+    phoneNumber: string;
+}
 
+export const FacilityDirectoryPage = () => {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [results, setResults] = useState<Facility[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
 
-const FacilityDirectoryPage = () => {
-    const searchParams = useSearchParams();
-    const router = useRouter();
+    const debouncedSearchTerm = useDebounce(searchTerm, 300); // Shortened delay for better feel
 
-    const stateFilter = searchParams.get("state") || "";
-    const securityFilter = searchParams.get("security") || "";
-    const typeFilter = searchParams.get("type") || "";
+    useEffect(() => {
+        const searchFacilities = async () => {
+            // Only search if the term is not empty
+            if (debouncedSearchTerm) {
+                setIsLoading(true);
+                setError("");
+                try {
+                    const response = await fetch(`http://localhost:3001/api/search/facility?name=${debouncedSearchTerm}`);
 
-    const handleChange = (key: string, value: string) => {
-        const params = new URLSearchParams(searchParams);
+                    if (!response.ok) {
 
-        if (value) {
-            params.set(key, value);
-        } else {
-            params.delete(key);
-        }
-        router.push(`/directory?${params.toString()}`);
-    };
+                        throw new Error('Network response was not ok');
+                    }
+                    const data = await response.json();
 
-    const filteredFacilities = mockFacilities.filter((f) => {
-        return (
-            (!stateFilter || f.state === stateFilter) &&
-            (!securityFilter || f.security === securityFilter) &&
-            (!typeFilter || f.type === typeFilter)
-        );
-    });
+                    setResults(data);
+                } catch (err: any) {
+                    setError(err.message);
+                    setResults([]);
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
+                // Clear results when the input is empty
+                setResults([]);
+                setError("");
+            }
+        };
+
+        searchFacilities();
+    }, [debouncedSearchTerm]);
 
     return (
-        <div className="bg-gray-50 min-h-screen">
+        // --- DARK THEME FIX: Added dark mode classes to the main container ---
+        <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl font-extrabold text-gray-900">
+                <header className="text-center mb-12">
+                    <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">
                         Facility Directory
                     </h1>
-                    <p className="mt-4 text-lg text-gray-600">
-                        Browse nationwide facilities and their specific rules.
+                    <p className="mt-4 text-lg text-gray-600 dark:text-gray-400">
+                        Search for federal facilities by name. Results will appear as you type.
                     </p>
-                </div>
+                </header>
 
-                <div className="bg-white p-6 rounded-2xl shadow-lg mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <select
-                            className="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
-                            value={stateFilter}
-                            onChange={(e) => handleChange("state", e.target.value)}
-                        >
-                            <option value="">Filter by State...</option>
-                            {states.map((s) => (
-                                <option key={s} value={s}>
-                                    {s}
-                                </option>
-                            ))}
-                        </select>
+                {/* --- UI FIX: Wrapped input and results in a relative container for dropdown effect --- */}
+                <div className="max-w-2xl mx-auto relative">
+                    <Input
+                        isClearable
+                        className="w-full"
+                        placeholder="Start typing a facility name (e.g., Coleman)..."
+                        size="lg"
+                        value={searchTerm}
+                        variant="bordered"
+                        onValueChange={setSearchTerm}
+                    />
 
-                        <select
-                            className="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
-                            value={securityFilter}
-                            onChange={(e) => handleChange("security", e.target.value)}
-                        >
-                            <option value="">Filter by Security Level...</option>
-                            <option>Maximum</option>
-                            <option>Medium</option>
-                            <option>Minimum</option>
-                            <option>Varies</option>
-                        </select>
-
-                        <select
-                            className="w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
-                            value={typeFilter}
-                            onChange={(e) => handleChange("type", e.target.value)}
-                        >
-                            <option value="">Filter by Facility Type...</option>
-                            <option>Prison</option>
-                            <option>Jail</option>
-                            <option>Detention Center</option>
-                            <option>County Jail</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                    {filteredFacilities.map((facility: Facility) => (
-                        <div
-                            key={facility.id}
-                            className="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col"
-                        >
-                            <h3 className="text-xl font-bold text-gray-900">
-                                {facility.name}
-                            </h3>
-                            <p className="text-gray-600">{facility.state}</p>
-                            <div className="mt-4 flex-grow space-y-4">
-                                <div>
-                                    <h4 className="font-semibold text-gray-800">Mail Rules</h4>
-                                    <p className="text-sm text-gray-600">{facility.mailRules}</p>
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold text-gray-800">
-                                        Visitation Policy
-                                    </h4>
-                                    <p className="text-sm text-gray-600">{facility.visitation}</p>
-                                </div>
-                            </div>
-                            <div className="mt-6">
-                                <span
-                                    className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-${facility.security === "Maximum" ? "red" : "blue"
-                                        }-100 text-${facility.security === "Maximum" ? "red" : "blue"
-                                        }-800`}
-                                >
-                                    {facility.security} Security
-                                </span>
-                                <span className="ml-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                                    {facility.population}
-                                </span>
-                            </div>
+                    {isLoading && (
+                        <div className="absolute top-full w-full mt-2">
+                            <Card className="bg-white dark:bg-gray-800 shadow-lg">
+                                <CardBody>
+                                    <div className="flex justify-center items-center p-4">
+                                        <Spinner color="primary" label="Searching..." />
+                                    </div>
+                                </CardBody>
+                            </Card>
                         </div>
-                    ))}
+                    )}
+
+                    {/* Results Dropdown List */}
+                    {!isLoading && debouncedSearchTerm && (
+                        <div className="absolute top-full w-full mt-2 z-10">
+                            <Card className="bg-white dark:bg-gray-800 shadow-lg">
+                                <CardBody>
+                                    {error && <p className="p-4 text-center text-red-500">{error}</p>}
+                                    {!error && results.length === 0 && (
+                                        <p className="p-4 text-center text-gray-500 dark:text-gray-400">No facilities found.</p>
+                                    )}
+                                    {results.length > 0 && (
+                                        <div className="max-h-96 overflow-y-auto">
+                                            {results.map((facility) => (
+                                                <Link key={facility.code} className="block w-full" href={`/facility/${facility.code}`}>
+                                                    <div className="p-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer">
+                                                        <p className="font-semibold text-gray-900 dark:text-white">{facility.nameDisplay}</p>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400">{facility.city}, {facility.state}</p>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </CardBody>
+                            </Card>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

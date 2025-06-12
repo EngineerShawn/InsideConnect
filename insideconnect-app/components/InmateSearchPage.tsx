@@ -1,299 +1,242 @@
 /* eslint-disable prettier/prettier */
-// Filename: ./app/components/InmateSearchPage.tsx
+// insideconnect-app/components/InmateSearchPage.tsx
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { mockInmates, states } from "../app/lib/mockData";
+import {
+    Input,
+    Button,
+    Select,
+    SelectItem,
+    Card,
+    CardBody,
+    Spinner,
+    Tabs,
+    Tab,
+    User,
+    Link,
+    Divider,
+} from "@heroui/react";
+
+// Define the structure of an inmate object based on the API response
+interface Inmate {
+    nameLast: string;
+    nameFirst: string;
+    nameMiddle: string;
+    sex: string;
+    race: string;
+    age: string;
+    inmateNum: string;
+    faclCode: string; // Facility Code for building the link
+    faclName: string;
+    projRelDate: string;
+}
+
+// ... (Your form data interfaces remain the same) ...
+interface NameSearchData {
+    nameFirst: string;
+    nameMiddle: string;
+    nameLast: string;
+    age: string;
+    race: string;
+    sex: string;
+}
+
+interface NumberSearchData {
+    numberType: string;
+    numberValue: string;
+}
 
 
-// Icons
-const SearchIcon = ({ className = "" }) => <span className={className}>🔍</span>;
-const ChevronDownIcon = ({ className = "" }) => <span className={className}>⬇️</span>;
-
-type Inmate = {
-    id: string;
-    name: string;
-    docId: string;
-    facility: string;
-    state: string;
-    photoUrl: string;
-    offense: string;
-    sentence: string;
-    lastUpdate: string;
-    race?: string;
-    sex?: string;
-    age?: number;
-};
-
-const InmateSearchPage = () => {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [state, setState] = useState("");
-    const [system, setSystem] = useState("");
-    const [showAdvanced, setShowAdvanced] = useState(false);
-    const [race, setRace] = useState("");
-    const [ageRange, setAgeRange] = useState("");
-    const [sex, setSex] = useState("");
-
+export const InmateSearchPage = () => {
+    const [selectedTab, setSelectedTab] = useState<string | number>("byName");
+    const [nameFormData, setNameFormData] = useState<NameSearchData>({
+        nameFirst: "",
+        nameMiddle: "",
+        nameLast: "",
+        age: "",
+        race: "",
+        sex: "",
+    });
+    const [numberFormData, setNumberFormData] = useState<NumberSearchData>({
+        numberType: "BOP",
+        numberValue: "",
+    });
     const [results, setResults] = useState<Inmate[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [hasSearched, setHasSearched] = useState(false);
 
-    interface HandleSearchEvent extends React.FormEvent<HTMLFormElement> {}
+    // ... (All of your handleInputChange, handleSelectChange, and handleSearch functions remain exactly the same) ...
+    const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
 
-    interface MockInmate extends Inmate {}
-
-    const handleSearch = (e: HandleSearchEvent): void => {
-        e.preventDefault();
-        setLoading(true);
-        setTimeout(() => {
-            let filtered: MockInmate[] = mockInmates.map((inmate) => ({
-                ...inmate,
-                id: String(inmate.id),
-            }));
-
-            if (searchTerm) {
-                filtered = filtered.filter(
-                    (inmate: MockInmate) =>
-                        inmate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        inmate.docId.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-            }
-            if (state) {
-                filtered = filtered.filter((inmate: MockInmate) => inmate.state === state);
-            }
-            if (system && system !== "All") {
-                filtered = filtered.filter((inmate: MockInmate) => {
-                    const f = inmate.facility.toLowerCase();
-
-                    if (system === "Federal") return f.includes("federal");
-                    if (system === "State") return f.includes("state") || f.includes("correctional");
-                    if (system === "County") return f.includes("jail");
-
-                    return true;
-                });
-            }
-
-            if (showAdvanced) {
-                if (race && race !== "All") filtered = filtered.filter((inmate: MockInmate) => inmate.race === race);
-                if (sex && sex !== "All") filtered = filtered.filter((inmate: MockInmate) => inmate.sex === sex);
-                if (ageRange) {
-                    const [min, max] = ageRange.split("-").map(Number);
-                    filtered = filtered.filter((inmate: MockInmate) => inmate.age !== undefined && inmate.age >= min && inmate.age <= max);
-                }
-            }
-
-            setResults(filtered);
-            setLoading(false);
-        }, 1000);
+        setNameFormData((prev) => ({ ...prev, [name]: value }));
     };
+    const handleNameSelectChange = (name: string) => (keys: any) => {
+        setNameFormData((prev) => ({ ...prev, [name]: Array.from(keys)[0] as string }));
+    };
+    const handleNumberInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNumberFormData((prev) => ({ ...prev, numberValue: e.target.value }));
+    };
+    const handleNumberTypeChange = (keys: any) => {
+        setNumberFormData((prev) => ({ ...prev, numberType: Array.from(keys)[0] as string }));
+    };
+    const handleSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError("");
+        setResults([]);
+        setHasSearched(true);
+        let searchPayload = {};
+
+        if (selectedTab === 'byName') {
+            searchPayload = nameFormData;
+        } else {
+            searchPayload = { inmateNum: numberFormData.numberValue };
+        }
+        try {
+            const response = await fetch('http://localhost:3001/api/search/inmate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(searchPayload),
+            });
+            const data = await response.json();
+
+            if (!response.ok || data.Messages?.errors) {
+                
+                throw new Error(data.Messages?.errors[0] || "An error occurred during the search.");
+            }
+            setResults(data.InmateLocator || []);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    const numberTypes = [
+        { key: "BOP", label: "BOP Register Number" },
+        { key: "DCDC", label: "DCDC Number" },
+        { key: "FBI", label: "FBI Number" },
+        { key: "INS", label: "INS Number" },
+    ];
+
 
     return (
-        <div className="bg-gray-50 min-h-screen">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="text-center mb-12">
-                    <h1 className="text-4xl font-extrabold text-gray-900">Inmate Search Engine</h1>
-                    <p className="mt-4 text-lg text-gray-600">Find individuals across all U.S. jurisdictions.</p>
-                </div>
-
-                <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
-                    <form onSubmit={handleSearch}>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="md:col-span-3">
-                                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="search">
-                                    Name or ID Number
-                                </label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <SearchIcon className="h-5 w-5 text-gray-400" />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* ... (Your header and search form JSX remain exactly the same) ... */}
+            <header className="text-center mb-8">
+                <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">
+                    Federal Inmate Locator
+                </h1>
+                <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">
+                    Search for federally incarcerated individuals by name or number.
+                </p>
+            </header>
+            <Card className="p-2 sm:p-6 bg-white dark:bg-gray-800 shadow-lg">
+                <form onSubmit={handleSearch}>
+                    <Tabs
+                        fullWidth
+                        aria-label="Search Options"
+                        selectedKey={selectedTab}
+                        size="lg"
+                        onSelectionChange={setSelectedTab}
+                    >
+                        <Tab key="byName" title="Search by Name">
+                            <Card className="p-4 sm:p-6 bg-transparent dark:bg-transparent shadow-none">
+                                <div className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <Input label="First Name" name="nameFirst" value={nameFormData.nameFirst} variant="bordered" onChange={handleNameInputChange} />
+                                        <Input label="Middle Name" name="nameMiddle" value={nameFormData.nameMiddle} variant="bordered" onChange={handleNameInputChange} />
+                                        <Input label="Last Name" name="nameLast" value={nameFormData.nameLast} variant="bordered" onChange={handleNameInputChange} />
                                     </div>
-                                    <input
-                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                        id="search"
-                                        placeholder="e.g., John Samuelson or A789-456123"
-                                        type="text"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <Input label="Age" name="age" type="number" value={nameFormData.age} variant="bordered" onChange={handleNameInputChange} />
+                                        <Select label="Race" name="race" selectedKeys={nameFormData.race ? [nameFormData.race] : []} variant="bordered" onSelectionChange={handleNameSelectChange('race')}>
+                                            {['White', 'Black', 'American Indian', 'Asian', 'Other'].map(r => <SelectItem key={r}>{r}</SelectItem>)}
+                                        </Select>
+                                        <Select label="Sex" name="sex" selectedKeys={nameFormData.sex ? [nameFormData.sex] : []} variant="bordered" onSelectionChange={handleNameSelectChange('sex')}>
+                                            {['Male', 'Female'].map(s => <SelectItem key={s}>{s}</SelectItem>)}
+                                        </Select>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="state">
-                                    State
-                                </label>
-                                <select
-                                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
-                                    id="state"
-                                    value={state}
-                                    onChange={(e) => setState(e.target.value)}
-                                >
-                                    <option value="">All States</option>
-                                    {states.map((s) => (
-                                        <option key={s} value={s}>
-                                            {s}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="system">
-                                    System
-                                </label>
-                                <select
-                                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
-                                    id="system"
-                                    value={system}
-                                    onChange={(e) => setSystem(e.target.value)}
-                                >
-                                    <option value="All">All Systems</option>
-                                    <option value="Federal">Federal</option>
-                                    <option value="State">State</option>
-                                    <option value="County">County</option>
-                                </select>
-                            </div>
-
-                            <div className="flex items-end">
-                                <button
-                                    className="w-full inline-flex items-center justify-center px-6 py-2 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 shadow-md"
-                                    type="submit"
-                                >
-                                    Search
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="mt-4">
-                            <button
-                                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
-                                type="button"
-                                onClick={() => setShowAdvanced(!showAdvanced)}
-                            >
-                                {showAdvanced ? "Hide" : "Show"} Advanced Filters{" "}
-                                <ChevronDownIcon
-                                    className={`ml-1 transform transition-transform ${showAdvanced ? "rotate-180" : ""}`}
-                                />
-                            </button>
-                        </div>
-
-                        {showAdvanced && (
-                            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 border-t pt-6 border-gray-200">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="race">
-                                        Race
-                                    </label>
-                                    <select
-                                        className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
-                                        id="race"
-                                        value={race}
-                                        onChange={(e) => setRace(e.target.value)}
-                                    >
-                                        <option value="All">All</option>
-                                        <option>White</option>
-                                        <option>African American</option>
-                                        <option>Hispanic</option>
-                                        <option>Asian</option>
-                                        <option>Native American</option>
-                                        <option>Other</option>
-                                    </select>
+                            </Card>
+                        </Tab>
+                        <Tab key="byNumber" title="Search by Number">
+                            <Card className="p-4 sm:p-6 bg-transparent dark:bg-transparent shadow-none">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Select defaultSelectedKeys={["BOP"]} label="Type of Number" name="numberType" variant="bordered" onSelectionChange={handleNumberTypeChange}>
+                                        {numberTypes.map((type) => (<SelectItem key={type.key} value={type.key}>{type.label}</SelectItem>))}
+                                    </Select>
+                                    <Input isRequired label="Number" name="numberValue" value={numberFormData.numberValue} variant="bordered" onChange={handleNumberInputChange} />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="age">
-                                        Age Range
-                                    </label>
-                                    <select
-                                        className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
-                                        id="age"
-                                        value={ageRange}
-                                        onChange={(e) => setAgeRange(e.target.value)}
-                                    >
-                                        <option value="">Any</option>
-                                        <option value="18-25">18-25</option>
-                                        <option value="26-35">26-35</option>
-                                        <option value="36-50">36-50</option>
-                                        <option value="51-99">51+</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="sex">
-                                        Sex
-                                    </label>
-                                    <select
-                                        className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-lg"
-                                        id="sex"
-                                        value={sex}
-                                        onChange={(e) => setSex(e.target.value)}
-                                    >
-                                        <option value="All">All</option>
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                    </select>
-                                </div>
-                            </div>
-                        )}
-                    </form>
-                        <div className="space-y-6">
-                            {results.length > 0 ? (
-                                results.map((inmate) => (
-                                    <div
-                                        key={inmate.id}
-                                        className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                                    >
-                                        <div className="md:flex">
-                                            <div className="md:flex-shrink-0 p-4 flex items-center justify-center">
-                                                <img
-                                                    alt={`Photo of ${inmate.name}`}
-                                                    className="h-24 w-24 object-cover rounded-full"
-                                                    src={inmate.photoUrl}
-                                                />
+                            </Card>
+                        </Tab>
+                    </Tabs>
+                    <div className="flex justify-end mt-4 px-4 sm:px-6">
+                        <Button color="primary" isLoading={isLoading} size="lg" type="submit">
+                            Search Inmates
+                        </Button>
+                    </div>
+                </form>
+            </Card>
+
+            {/* --- NEW: Redesigned Results Section --- */}
+            <div className="mt-12">
+                {isLoading ? (
+                    <div className="flex justify-center p-8"><Spinner color="primary" label="Searching..." size="lg" /></div>
+                ) : error ? (
+                    <p className="text-center text-red-500">{error}</p>
+                ) : hasSearched && results.length === 0 ? (
+                    <p className="text-center text-gray-500 dark:text-gray-400">No results found for your search criteria.</p>
+                ) : (
+                    <div className="space-y-6">
+                        {results.map((inmate) => (
+                            <Card key={inmate.inmateNum} className="bg-white dark:bg-gray-800 shadow-md">
+                                <CardBody>
+                                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-6">
+                                        {/* Mugshot Column */}
+                                        <div className="sm:col-span-2 flex justify-center items-center">
+                                            <User
+                                                avatarProps={{
+                                                    size: "lg",
+                                                    src: `https://www.bop.gov/inmateloc/Photos/${inmate.inmateNum}.jpg`
+                                                }}
+                                                description={`BOP Register No: ${inmate.inmateNum}`}
+                                                name={`${inmate.nameFirst} ${inmate.nameLast}`}
+                                            />
+                                        </div>
+
+                                        {/* Details Column */}
+                                        <div className="sm:col-span-10 grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2">
+                                            {/* Personal Details */}
+                                            <div className="space-y-1">
+                                                <h4 className="font-semibold text-gray-800 dark:text-gray-200">Personal Details</h4>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400"><strong>Age:</strong> {inmate.age}</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400"><strong>Race:</strong> {inmate.race}</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400"><strong>Sex:</strong> {inmate.sex}</p>
                                             </div>
-                                            <div className="p-6 flex-grow">
-                                                <div className="flex justify-between items-start">
-                                                    <div>
-                                                        <Link
-                                                            className="block mt-1 text-2xl leading-tight font-bold text-gray-900 hover:text-blue-600"
-                                                            href={`/profile/${inmate.id}`}
-                                                        >
-                                                            {inmate.name}
-                                                        </Link>
-                                                        <p className="mt-1 text-gray-500">DOC ID: {inmate.docId}</p>
-                                                    </div>
-                                                    <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700">
-                                                        Follow
-                                                    </button>
-                                                </div>
-                                                <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                                                    <div>
-                                                        <p className="text-gray-500 font-semibold">Location</p>
-                                                        <p className="text-gray-800">
-                                                            {inmate.facility}, {inmate.state}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-gray-500 font-semibold">Offense</p>
-                                                        <p className="text-gray-800">{inmate.offense}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-gray-500 font-semibold">Sentence</p>
-                                                        <p className="text-gray-800">{inmate.sentence}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-gray-500 font-semibold">Last Update</p>
-                                                        <p className="text-gray-800">{inmate.lastUpdate}</p>
-                                                    </div>
-                                                </div>
+                                            {/* Location Details */}
+                                            <div className="space-y-1">
+                                                <h4 className="font-semibold text-gray-800 dark:text-gray-200">Location</h4>
+                                                <Link isExternal color="primary" href={`/facility/${inmate.faclCode}`}>
+                                                    {inmate.faclName}
+                                                </Link>
+                                            </div>
+                                            {/* Release Details */}
+                                            <div className="space-y-1">
+                                                <h4 className="font-semibold text-gray-800 dark:text-gray-200">Release Information</h4>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                    <strong>Projected Release:</strong> {inmate.projRelDate || 'Not Available'}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                ))
-                            ) : (
-                                <div className="text-center py-10 bg-white rounded-lg shadow-md">
-                                    <p className="text-gray-600">No results found. Try adjusting your search criteria.</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
+                                </CardBody>
+                            </Card>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

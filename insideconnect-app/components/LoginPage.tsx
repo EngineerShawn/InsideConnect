@@ -6,12 +6,9 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input, Button } from "@heroui/react";
-
-import { useAuth } from "../app/context/AuthContext";
-
-import { ForgotPasswordModal } from "./ForgotPasswordModal";
-
+import { useAuth } from "../app/blog/context/AuthContext";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "@/components/icons";
+import { ForgotPasswordModal } from "./ForgotPasswordModal";
 
 const LoginPage = () => {
     const router = useRouter();
@@ -21,8 +18,6 @@ const LoginPage = () => {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-
-    // --- NEW: State to control the forgot password modal ---
     const [isForgotModalOpen, setForgotModalOpen] = useState(false);
 
     const toggleVisibility = () => setIsPasswordVisible(!isPasswordVisible);
@@ -56,6 +51,7 @@ const LoginPage = () => {
 
     return (
         <>
+            {/* --- CHANGES FOR DARK MODE --- */}
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
                 <div className="sm:mx-auto sm:w-full sm:max-w-md">
                     <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
@@ -112,7 +108,6 @@ const LoginPage = () => {
                 </div>
             </div>
 
-            {/* --- ADD THIS AT THE END --- */}
             <ForgotPasswordModal
                 isOpen={isForgotModalOpen}
                 onClose={() => setForgotModalOpen(false)}

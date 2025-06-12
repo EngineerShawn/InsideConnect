@@ -410,6 +410,63 @@ export const XCircleIcon = (props: IconSvgProps) => (
     </svg>
 );
 
+export const DollarSignIcon = (props: IconSvgProps) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+  >
+    <path d="M12 1v22" />
+    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+  </svg>
+);
+
+export const PlusIcon = (props: IconSvgProps) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+  >
+    <path d="M12 5v14" />
+    <path d="M5 12h14" />
+  </svg>
+);
+
+export const MoreVerticalIcon = (props: IconSvgProps) => (
+  <svg
+    aria-hidden="true"
+    fill="currentColor"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+  >
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="12" cy="5" r="2" />
+    <circle cx="12" cy="19" r="2" />
+  </svg>
+);
+
 export default {
   Logo,
   DiscordIcon,
@@ -428,7 +485,10 @@ export default {
   EyeFilledIcon,
   EyeSlashFilledIcon,
   CheckIcon,
-  XCircleIcon
+  XCircleIcon,
+  DollarSignIcon,
+  PlusIcon,
+  MoreVerticalIcon,
 
 }
 

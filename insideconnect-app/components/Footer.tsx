@@ -12,8 +12,8 @@ export const Footer = () => {
                 <div className="xl:grid xl:grid-cols-3 xl:gap-8">
                     <div className="space-y-4">
                         <Link
-                            href="/"
                             className="text-2xl font-bold text-gray-800 hover:text-blue-600"
+                            href="/"
                         >
                             Inside<span className="text-blue-600">Connect</span>
                         </Link>
@@ -30,24 +30,24 @@ export const Footer = () => {
                                 <ul className="mt-4 space-y-2">
                                     <li>
                                         <Link
-                                            href="/inmate-search"
                                             className="text-base text-gray-600 hover:text-blue-600"
+                                            href="/inmate-search"
                                         >
                                             Inmate Search
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
-                                            href="/facility-directory"
                                             className="text-base text-gray-600 hover:text-blue-600"
+                                            href="/facility-directory"
                                         >
                                             Facility Directory
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
-                                            href="/signup"
                                             className="text-base text-gray-600 hover:text-blue-600"
+                                            href="/signup"
                                         >
                                             Support Circles
                                         </Link>
@@ -61,16 +61,16 @@ export const Footer = () => {
                                 <ul className="mt-4 space-y-2">
                                     <li>
                                         <Link
-                                            href="/privacy"
                                             className="text-base text-gray-600 hover:text-blue-600"
+                                            href="/privacy"
                                         >
                                             Privacy Policy
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
-                                            href="/terms"
                                             className="text-base text-gray-600 hover:text-blue-600"
+                                            href="/terms"
                                         >
                                             Terms of Service
                                         </Link>
@@ -86,16 +86,16 @@ export const Footer = () => {
                                 <ul className="mt-4 space-y-2">
                                     <li>
                                         <Link
-                                            href="/about"
                                             className="text-base text-gray-600 hover:text-blue-600"
+                                            href="/about"
                                         >
                                             About
                                         </Link>
                                     </li>
                                     <li>
                                         <Link
-                                            href="/contact"
                                             className="text-base text-gray-600 hover:text-blue-600"
+                                            href="/contact"
                                         >
                                             Contact Us
                                         </Link>
@@ -107,7 +107,7 @@ export const Footer = () => {
                 </div>
                 <div className="mt-12 border-t border-gray-200 pt-8">
                     <p className="text-base text-gray-500 xl:text-center">
-                        &copy; 2025 InsideConnect. All rights reserved.
+                        Copyright &copy; 2025 InsideConnect. All rights reserved. | Developed by EngineerShawn
                     </p>
                 </div>
             </div>

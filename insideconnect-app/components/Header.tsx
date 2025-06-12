@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from "@heroui/react";
 
-import { useAuth } from "../app/context/AuthContext"; // Import our custom hook
+import { useAuth } from "../app/blog/context/AuthContext"; // Import our custom hook
 
 import { MenuIcon, XIcon, SearchIcon, BuildingIcon } from "./icons"; // Import icons
 import { ThemeSwitch } from "./theme-switch"; // Import ThemeSwitch
@@ -90,7 +90,7 @@ export const Header = () => {
                             <div className="hidden lg:flex items-center space-x-3"> {/* Increased space-x for ThemeSwitch */}
                                 {user ? (
                                     // --- NEW: USER AVATAR DROPDOWN ---
-                                    <Dropdown placement="bottom-end" showArrow radius="sm" classNames={{ base: "before:bg-default-200", content: "p-0 border-small border-divider bg-background" }}>
+                                    <Dropdown showArrow classNames={{ base: "before:bg-default-200", content: "p-0 border-small border-divider bg-background" }} placement="bottom-end" radius="sm">
                                         <DropdownTrigger>
                                             <User
                                                 as="button"
