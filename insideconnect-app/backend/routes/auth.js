@@ -9,6 +9,8 @@ const { VerificationEmail } = require('../emails/VerificationEmail.js');
 const { PasswordResetEmail } = require('../emails/PasswordResetEmail.js');
 const knexConfig = require('../knexfile.js');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+
 
 
 const db = knex(knexConfig.development);
@@ -132,7 +134,7 @@ router.post('/login', async (req, res) => {
         // 3. Compare the provided password with the stored hash
         const isPasswordCorrect = await bcrypt.compare(password, user.password_hash);
         if (!isPasswordCorrect) {
-            return res.status(401).json({ message: "Invalid credentials." });
+            return res.status(401).json({ message: "Password is incorrect. Please try again." });
         }
 
         // 4. Generate a JWT if credentials are correct
@@ -170,11 +172,15 @@ router.post('/login', async (req, res) => {
 router.post('/request-password-reset', async (req, res) => {
     try {
         const { email } = req.body;
-        const user = await db('users').where({ email }).first();
+        console.log(`[DEBUG] Password reset requested for email: ${email}`); //DEBUG LOG 1
+        const user = await db('users')
+            .where(db.raw('LOWER(email) = ?', [email.toLowerCase()]))
+            .first();
 
         // SECURITY NOTE: We send a success response even if the user is not found.
         // This prevents attackers from using this form to discover which emails are registered.
         if (user) {
+            console.log(`[DEBUG] User found with ID: ${user.id}. Preparing to send reset email.`); //DEBUG LOG 2
             // 1. Generate a secure, single-use token
             const resetToken = crypto.randomBytes(32).toString('hex');
             const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
@@ -185,25 +191,72 @@ router.post('/request-password-reset', async (req, res) => {
                 verification_token: hashedToken,
                 token_expires_at: tokenExpiresAt,
             });
+            console.log(`[DEBUG] Database updated with new reset token for user ID: ${user.id}`);
 
             // 3. Create the password reset link for the email
             const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
 
+            console.log('[DEBUG] Attempting to send email via Resend...'); // Log 4
             // 4. Send the email with the reset link
             await resend.emails.send({
-                from: 'noreply@insideconnect.dev', // Use a no-reply address
+                from: 'onboarding@resend.dev', // Use a no-reply address
                 to: user.email,
                 subject: 'Your InsideConnect Password Reset Link',
                 react: PasswordResetEmail({ resetLink: resetLink }),
             });
+            console.log(`[DEBUG] Email sent successfully to ${user.email}.`); // LOG 5
+        } else {
+            console.log(`[DEBUG] No user found with email: ${email}.`); // LOG 6
         }
 
         res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
 
     } catch (error) {
+        console.error("[DEBUG] Password Reset Request Error:", error); // Log 7
         console.error("Password Reset Request Error:", error);
         // Send a generic success message here too for security
         res.status(200).json({ message: "If an account with that email exists, a password reset link has been sent." });
+    }
+});
+
+
+// --- POST /api/auth/reset-password ---
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { token, password } = req.body;
+
+        if (!token || !password) {
+            return res.status(400).json({ message: "Token and new password are required." });
+        }
+
+        // 1. Hash the incoming token to find it in the database
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        // 2. Find the user by the hashed token and check if the token is expired
+        const user = await db('users')
+            .where({ verification_token: hashedToken })
+            .where('token_expires_at', '>', new Date())
+            .first();
+
+        if (!user) {
+            return res.status(400).json({ message: "This password reset link is invalid or has expired." });
+        }
+
+        // 3. Hash the new password
+        const new_password_hash = await bcrypt.hash(password, 10);
+
+        // 4. Update the user's password and clear the token fields
+        await db('users').where({ id: user.id }).update({
+            password_hash: new_password_hash,
+            verification_token: null,
+            token_expires_at: null,
+        });
+
+        res.status(200).json({ message: "Password has been reset successfully. You can now log in." });
+
+    } catch (error) {
+        console.error("Reset Password Error:", error);
+        res.status(500).json({ message: "An internal server error occurred." });
     }
 });
 

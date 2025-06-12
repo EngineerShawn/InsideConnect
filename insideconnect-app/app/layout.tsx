@@ -29,22 +29,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem("isLoggedIn") === "true") {
-      setLoggedIn(true);
-    }
-  }, []);
-
-    const handleLogout = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("isLoggedIn");
-    }
-    setLoggedIn(false);
-    // Navigation to "/" is handled in Header's handleLogoutClick
-  };
-
   return (
     <html suppressHydrationWarning lang="en">
       <head />
@@ -58,7 +42,7 @@ export default function RootLayout({
           {/* AuthProvider wraps everything that needs auth info */}
           <AuthProvider>
           <div className="relative flex flex-col h-screen">
-            <Header loggedIn={loggedIn} onLogout={handleLogout} />
+            <Header />
             <main className="container max-w-full flex-grow">
               {children}
             </main>

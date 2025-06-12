@@ -370,6 +370,46 @@ export const EyeFilledIcon = (props: IconSvgProps) => (
   </svg>
 );
 
+export const CheckIcon = (props: IconSvgProps) => (
+  <svg
+    aria-hidden="true"
+    fill="none"
+    focusable="false"
+    height="1em"
+    role="presentation"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+    width="1em"
+    {...props}
+  >
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+
+export const XCircleIcon = (props: IconSvgProps) => (
+    <svg
+      aria-hidden="true"
+      fill="none"
+      focusable="false"
+      height="1em"
+      role="presentation"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      width="1em"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="m15 9-6 6" />
+      <path d="m9 9 6 6" />
+    </svg>
+);
+
 export default {
   Logo,
   DiscordIcon,
@@ -386,7 +426,9 @@ export default {
   MailIcon,
   CalendarIcon,
   EyeFilledIcon,
-  EyeSlashFilledIcon
+  EyeSlashFilledIcon,
+  CheckIcon,
+  XCircleIcon
 
 }
 
