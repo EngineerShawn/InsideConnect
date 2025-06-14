@@ -5,7 +5,6 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@heroui/react";
-import { motion } from "framer-motion";
 
 import { SearchIcon, BuildingIcon, UsersIcon, ShieldCheckIcon, MailIcon, CalendarIcon } from "./icons";
 
@@ -73,12 +72,6 @@ export const HomePage = () => {
     return (
         <div className="bg-white dark:bg-gray-900 w-screen">
             {/* Hero Section */}
-            <motion.section
-                animate={{ opacity: 1, y: 0 }}
-                className="py-20 sm:py-32"
-                initial={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.8 }}
-            >
                 <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white tracking-tight">
                         The First True <span className="text-blue-600 dark:text-blue-500">Prison Communication</span>
@@ -102,7 +95,6 @@ export const HomePage = () => {
                         </Link>
                     </div>
                 </main>
-            </motion.section>
 
             {/* Features Section */}
             <section className="bg-gray-50 dark:bg-gray-950 py-20 sm:py-24">
@@ -174,4 +166,3 @@ export const HomePage = () => {
 };
 
 export default HomePage;
-
