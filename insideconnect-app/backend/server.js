@@ -14,11 +14,13 @@ app.use(cors()); // Use cors middleware
 // --- Add these two lines to import and use the auth routes ---
 const authRoutes = require('./routes/auth');
 const searchRoutes = require('./routes/search');
+const userRoutes = require('./routes/users');
+
 
 
 app.use('/api/auth', authRoutes);
 app.use('/api/search', searchRoutes);
-
+app.use('/api/users', userRoutes);
 
 
 // Simple root route for testing
