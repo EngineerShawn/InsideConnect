@@ -6,15 +6,15 @@ import React, { useState, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input, Button } from "@heroui/react";
 
-import { EyeFilledIcon, EyeSlashFilledIcon, ShieldCheckIcon, CheckIcon, XCircleIcon } from "./icons";
+import { EyeFilledIcon, EyeSlashFilledIcon, ShieldCheckIcon, CheckIcon, XCircleIcon } from "../../components/icons";
 
 // We wrap the main component in a Suspense boundary because useSearchParams() requires it.
 const ResetPasswordPage = () => {
-  return (
-    <Suspense fallback={<div className="text-center p-8">Loading...</div>}>
-      <ResetPasswordForm />
-    </Suspense>
-  );
+    return (
+        <Suspense fallback={<div className="text-center p-8">Loading...</div>}>
+            <ResetPasswordForm />
+        </Suspense>
+    );
 };
 
 const ResetPasswordForm = () => {
@@ -139,9 +139,9 @@ const ResetPasswordForm = () => {
                                 />
                                 {confirmPassword && <div className="mt-2"><Requirement label="Passwords must match" met={passwordsMatch} /></div>}
                             </div>
-                            
+
                             {error && <p className="text-sm text-red-500 text-center">{error}</p>}
-                            
+
                             <div>
                                 <Button className="w-full" color="primary" isLoading={isLoading} type="submit">
                                     Reset Password
