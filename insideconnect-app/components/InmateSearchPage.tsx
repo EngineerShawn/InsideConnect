@@ -15,7 +15,6 @@ import {
     Tab,
     User,
     Link,
-    Divider,
 } from "@heroui/react";
 
 // Define the structure of an inmate object based on the API response

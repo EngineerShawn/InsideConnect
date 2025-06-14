@@ -77,7 +77,7 @@ const ResetPasswordForm = () => {
                     router.push('/login');
                 }, 2500);
             }
-        } catch (err) {
+        } catch {
             setError("Failed to connect to the server.");
         } finally {
             setIsLoading(false);

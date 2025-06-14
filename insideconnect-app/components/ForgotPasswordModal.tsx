@@ -56,7 +56,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
     return (
         <Modal isOpen={isOpen} placement="center" onOpenChange={handleClose}>
             <ModalContent>
-                {(close) => (
+                {(_close) => (
                     <>
                         <ModalHeader className="flex flex-col gap-1">
                             Reset Your Password

@@ -44,7 +44,7 @@ const LoginPage = () => {
                 login(data.token);
                 router.push("/dashboard");
             }
-        } catch (err) {
+        } catch {
             setError("Failed to connect to the server. Please try again.");
         } finally {
             setIsLoading(false);

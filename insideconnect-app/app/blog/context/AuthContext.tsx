@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 // insideconnect-app/app/context/AuthContext.tsx
 "use client";
@@ -6,13 +7,11 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 import { jwtDecode } from 'jwt-decode'; // We'll need to install this library
 
 interface AuthUser {
-    [x: string]: string;
     id: number;
     email: string;
     role: string;
     firstName: string;
     lastName: string;
-
 }
 
 interface AuthContextType {

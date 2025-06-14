@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 "use client";
 
-import React, { useState, useEffect } from "react";
 import "@/styles/globals.css";
 import clsx from "clsx";
 

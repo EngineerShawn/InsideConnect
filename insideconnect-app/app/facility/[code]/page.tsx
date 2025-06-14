@@ -1,6 +1,4 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable unused-imports/no-unused-imports */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // insideconnect-app/app/facility/[code]/page.tsx
 "use client";
 

@@ -15,7 +15,6 @@ import { VerificationModal } from "./VerificationModal";
 import { EyeFilledIcon, EyeSlashFilledIcon, ChevronDownIcon } from "./icons";
 
 const SignUpPage = () => {
-    const router = useRouter();
 
     // Form field states
     const [firstName, setFirstName] = useState("");
@@ -106,7 +105,7 @@ const SignUpPage = () => {
                 setRegisteredEmail(data.email);
                 setVerificationModalOpen(true);
             }
-        } catch (error) {
+        } catch {
             setFormError("An unexpected error occurred. Could not connect to the backend server.");
         }
     };
