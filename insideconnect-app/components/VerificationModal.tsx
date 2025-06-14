@@ -14,7 +14,7 @@ import {
     Input,
 } from "@heroui/react";
 
-import { ShieldCheckIcon } from "@/components/icons"; // Assuming you have a success icon
+import { ShieldCheckIcon } from "./icons"; // Assuming you have a success icon
 
 interface VerificationModalProps {
     isOpen: boolean;

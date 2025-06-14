@@ -24,7 +24,7 @@
 //   HeartFilledIcon,
 //   SearchIcon,
 //   Logo,
-// } from "@/components/icons";
+// } from "./icons";
 
 // export const Navbar = () => {
 //   const searchInput = (

@@ -12,8 +12,7 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/r
 import { states } from "../app/lib/mockData";
 
 import { VerificationModal } from "./VerificationModal";
-
-import { EyeFilledIcon, EyeSlashFilledIcon, ChevronDownIcon } from "@/components/icons";
+import { EyeFilledIcon, EyeSlashFilledIcon, ChevronDownIcon } from "./icons";
 
 const SignUpPage = () => {
     const router = useRouter();
@@ -82,7 +81,8 @@ const SignUpPage = () => {
         }
 
         if (!isPasswordValid) {
-            console.log("Validation failed. Please correct the errors.");
+            // console.log("Validation failed. Please correct the errors.");
+            setFormError("Password is not valid");
 
             return;
         }

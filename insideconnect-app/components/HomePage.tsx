@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import { motion } from "framer-motion";
 
-import { SearchIcon, BuildingIcon, UsersIcon, ShieldCheckIcon, MailIcon, CalendarIcon } from "../components/icons";
+import { SearchIcon, BuildingIcon, UsersIcon, ShieldCheckIcon, MailIcon, CalendarIcon } from "./icons";
 
 export const HomePage = () => {
     const features = [

@@ -6,8 +6,10 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input, Button } from "@heroui/react";
+
 import { useAuth } from "../app/blog/context/AuthContext";
-import { EyeFilledIcon, EyeSlashFilledIcon } from "@/components/icons";
+
+import { EyeFilledIcon, EyeSlashFilledIcon } from "./icons";
 import { ForgotPasswordModal } from "./ForgotPasswordModal";
 
 const LoginPage = () => {
