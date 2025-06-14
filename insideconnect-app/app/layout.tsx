@@ -1,17 +1,17 @@
 /* eslint-disable prettier/prettier */
 "use client";
 
-import React, { useState, useEffect } from "react";
-import "@/styles/globals.css";
+
+import "../styles/globals.css";
 import clsx from "clsx";
 
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { fontSans } from "../config/fonts";
 
 import { Providers } from "./providers";
 import { AuthProvider } from "./blog/context/AuthContext";
 
-import { fontSans } from "@/config/fonts";
 
 // export const metadata: Metadata = {
 //   title: {
