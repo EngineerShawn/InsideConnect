@@ -1,13 +1,18 @@
 /* eslint-disable prettier/prettier */
+// insideconnect-app/app/dashboard/[...tab]/page.tsx
 "use client";
 
 import DashboardPageComponent from "../../../components/DashboardPage";
 
-// This page will handle routes like /dashboard/followed, /dashboard/circles, etc.
-// The `params.tab` will be an array of the segments after /dashboard/
-// e.g., for /dashboard/followed, params.tab would be ['followed']
-export default function DashboardPage({ params }: { params: { tab: string[] } }) {
-  // You can pass params.tab to DashboardPageComponent if it needs to know the specific sub-route
-  // For now, DashboardPageComponent uses usePathname(), which should still work.
+// 1. Define a clear, explicit type for the page's props
+type DynamicDashboardPageProps = {
+  params: {
+    tab: string[];
+  };
+};
+
+// 2. Rename the function to be more specific and use the new prop type
+export default function DynamicDashboardPage({ params }: DynamicDashboardPageProps) {
+  // The component's logic remains the same: it renders the main dashboard component.
   return <DashboardPageComponent />;
 }
