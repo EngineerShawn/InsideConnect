@@ -8,7 +8,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useParams } from 'next/navigation';
 import { Card, CardBody, CardHeader, Divider, Spinner, Image, Tabs, Tab, Link as UILink } from '@heroui/react';
 
-// import { MailIcon, PhoneIcon } from '@/components/icons';
+import { MailIcon, PhoneIcon } from '@/components/icons';
 
 interface FacilityDetails {
     code: string;

@@ -6,7 +6,7 @@ import React, { useState, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Input, Button } from "@heroui/react";
 
-import { EyeFilledIcon, EyeSlashFilledIcon, ShieldCheckIcon, CheckIcon, XCircleIcon } from "../../components/icons";
+import { EyeFilledIcon, EyeSlashFilledIcon, ShieldCheckIcon, CheckIcon, XCircleIcon } from "./icons";
 
 // We wrap the main component in a Suspense boundary because useSearchParams() requires it.
 const ResetPasswordPage = () => {
