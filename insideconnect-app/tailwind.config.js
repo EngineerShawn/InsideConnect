@@ -1,7 +1,10 @@
-import {heroui} from "@heroui/theme"
+// insideconnect-app/tailwind.config.js
+const { heroui } = require("@heroui/theme");
+
+
 
 /** @type {import('tailwindcss').Config} */
-const config = {
+module.exports = {
   content: [
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
@@ -17,6 +20,4 @@ const config = {
   },
   darkMode: "class",
   plugins: [heroui()],
-}
-
-module.exports = config;
+};
