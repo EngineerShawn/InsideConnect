@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 // insideconnect-app/app/context/AuthContext.tsx
