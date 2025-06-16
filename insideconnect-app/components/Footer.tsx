@@ -7,12 +7,12 @@ import Link from "next/link";
 
 export const Footer = () => {
     return (
-        <footer className="bg-gray-50 border-t border-gray-200">
+        <footer className="bg-gray-50 border-t border-gray-200 dark:bg-gray-900 dark:border-gray-700">
             <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="xl:grid xl:grid-cols-3 xl:gap-8">
                     <div className="space-y-4">
                         <Link
-                            className="text-2xl font-bold text-gray-800 hover:text-blue-600"
+                            className="text-2xl font-bold text-gray-800 hover:text-blue-600 dark:text-gray-200 dark:hover:text-blue-500"
                             href="/"
                         >
                             Inside<span className="text-blue-600">Connect</span>
@@ -25,12 +25,12 @@ export const Footer = () => {
                         <div className="md:grid md:grid-cols-2 md:gap-8">
                             <div>
                                 <h3 className="text-sm font-semibold text-gray-500 tracking-wider uppercase">
-                                    Solutions
+                                    Solutions {/* Dark mode text color */}
                                 </h3>
                                 <ul className="mt-4 space-y-2">
                                     <li>
                                         <Link
-                                            className="text-base text-gray-600 hover:text-blue-600"
+                                            className="text-base text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500"
                                             href="/inmate-search"
                                         >
                                             Inmate Search
@@ -38,7 +38,7 @@ export const Footer = () => {
                                     </li>
                                     <li>
                                         <Link
-                                            className="text-base text-gray-600 hover:text-blue-600"
+                                            className="text-base text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500"
                                             href="/facility-directory"
                                         >
                                             Facility Directory
@@ -46,7 +46,7 @@ export const Footer = () => {
                                     </li>
                                     <li>
                                         <Link
-                                            className="text-base text-gray-600 hover:text-blue-600"
+                                            className="text-base text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500"
                                             href="/signup"
                                         >
                                             Support Circles
@@ -56,12 +56,12 @@ export const Footer = () => {
                             </div>
                             <div className="mt-12 md:mt-0">
                                 <h3 className="text-sm font-semibold text-gray-500 tracking-wider uppercase">
-                                    Legal
+                                    Legal {/* Dark mode text color */}
                                 </h3>
                                 <ul className="mt-4 space-y-2">
                                     <li>
                                         <Link
-                                            className="text-base text-gray-600 hover:text-blue-600"
+                                            className="text-base text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500"
                                             href="/privacy"
                                         >
                                             Privacy Policy
@@ -69,7 +69,7 @@ export const Footer = () => {
                                     </li>
                                     <li>
                                         <Link
-                                            className="text-base text-gray-600 hover:text-blue-600"
+                                            className="text-base text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500"
                                             href="/terms"
                                         >
                                             Terms of Service
@@ -80,13 +80,13 @@ export const Footer = () => {
                         </div>
                         <div className="md:grid md:grid-cols-2 md:gap-8">
                             <div>
-                                <h3 className="text-sm font-semibold text-gray-500 tracking-wider uppercase">
+                                <h3 className="text-sm font-semibold text-gray-500 tracking-wider uppercase"> {/* Dark mode text color */}
                                     Company
                                 </h3>
                                 <ul className="mt-4 space-y-2">
                                     <li>
                                         <Link
-                                            className="text-base text-gray-600 hover:text-blue-600"
+                                            className="text-base text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500"
                                             href="/about"
                                         >
                                             About
@@ -94,7 +94,7 @@ export const Footer = () => {
                                     </li>
                                     <li>
                                         <Link
-                                            className="text-base text-gray-600 hover:text-blue-600"
+                                            className="text-base text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500"
                                             href="/contact"
                                         >
                                             Contact Us
@@ -105,7 +105,7 @@ export const Footer = () => {
                         </div>
                     </div>
                 </div>
-                <div className="mt-12 border-t border-gray-200 pt-8">
+                <div className="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
                     <p className="text-base text-gray-500 xl:text-center">
                         Copyright &copy; 2025 InsideConnect. All rights reserved. | Developed by EngineerShawn
                     </p>

@@ -32,7 +32,7 @@ export const Header = () => {
                 router.push('/dashboard');
                 break;
             case "settings":
-                router.push('/dashboard/settings'); // Assuming you have a /settings page
+                router.push('/settings'); // Assuming you have a /settings page
                 break;
             case "inmate_search":
                 router.push('/inmate-search');
